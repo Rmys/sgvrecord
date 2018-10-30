@@ -1,0 +1,11 @@
+[Desktop Entry]
+Name=SGvrecord
+GenericName=record screen cast
+Comment=Simple Tool To Record Screen
+Exec=sgvrecord.py
+Icon=com.github.yucefsourani.sgvrecord
+Terminal=false
+Type=Application
+StartupNotify=true
+Categories=GTK;
+
