@@ -1,4 +1,4 @@
-# sgvrecord
+# sgvrecord BETA
 Simple Tool To Record Screen
 
 https://arfedora.blogspot.com
