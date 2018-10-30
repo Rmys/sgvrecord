@@ -276,7 +276,26 @@ class GstScreenCast(object):
         self.selectarea   = selectarea
         if self.xid != 0:
             self.use_damage = "false"
-        if self.xid == 0 and not self.selectarea:
+        if self.xid != 0 or  self.selectarea:
+            self.pipe         = Gst.parse_launch("ximagesrc startx={} \
+                                             starty={} \
+                                             endx={} \
+                                             endy={} \
+                                             show-pointer={} \
+                                             xid = {} \
+                                             use-damage={} !  \
+                                             {} \
+                                             ! filesink \
+                                             location={}".format(self.startx,
+                                                                 self.starty,
+                                                                 self.endx,
+                                                                 self.endy,
+                                                                 self.show_pointer,
+                                                                 self.xid,
+                                                                 self.use_damage,
+                                                                 self.pipeline,
+                                                                 self.filelocation))
+        else:
             self.pipe         = Gst.parse_launch("ximagesrc startx={} \
                                              starty={} \
                                              endx={} \
@@ -297,25 +316,6 @@ class GstScreenCast(object):
                                                                  self.framerate,
                                                                  self.endx,
                                                                  self.endy,
-                                                                 self.pipeline,
-                                                                 self.filelocation))
-        else:
-            self.pipe         = Gst.parse_launch("ximagesrc startx={} \
-                                             starty={} \
-                                             endx={} \
-                                             endy={} \
-                                             show-pointer={} \
-                                             xid = {} \
-                                             use-damage={} !  \
-                                             {} \
-                                             ! filesink \
-                                             location={}".format(self.startx,
-                                                                 self.starty,
-                                                                 self.endx,
-                                                                 self.endy,
-                                                                 self.show_pointer,
-                                                                 self.xid,
-                                                                 self.use_damage,
                                                                  self.pipeline,
                                                                  self.filelocation))
         
@@ -886,7 +886,7 @@ class AppWindow(Gtk.ApplicationWindow):
             iconify = True
         else:
             iconify = False
-        
+
         if is_gnome_on_xorg():
             self.player = ScreenCast(location,
                                      pipeline=pipe,
