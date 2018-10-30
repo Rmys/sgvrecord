@@ -6,9 +6,9 @@ https://arfedora.blogspot.com
 
 # Screenshot
 
-![Alt text](https://raw.githubusercontent.com/yucefsourani/sgvrecord/master/0.jpg "Screenshot")
+![Alt text](https://raw.githubusercontent.com/yucefsourani/sgvrecord/master/Screenshot/1.jpg "Screenshot")
 
-![Alt text](https://raw.githubusercontent.com/yucefsourani/sgvrecord/master/2.jpg "Screenshot")
+![Alt text](https://raw.githubusercontent.com/yucefsourani/sgvrecord/master/Screenshot/2.jpg "Screenshot")
 
 
 
