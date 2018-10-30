@@ -16,7 +16,7 @@ https://arfedora.blogspot.com
 
   * ``` python3 ```
   
-  * ``` gtk+ ```
+  * ``` gtk3 ```
   
   * ``` pygobject3 ```
  
