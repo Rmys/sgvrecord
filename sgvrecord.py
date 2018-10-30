@@ -254,7 +254,8 @@ class GstScreenCast(object):
                       start_button,
                       stop_button,
                       framerate,
-                      time_label):
+                      time_label,
+                      selectarea):
                           
         self.filelocation = filelocation
         self.start_button = start_button
@@ -272,9 +273,11 @@ class GstScreenCast(object):
         self.parent       = parent
         self.iconify      = iconify
         self.framerate    = framerate
+        self.selectarea   = selectarea
         if self.xid != 0:
             self.use_damage = "false"
-        self.pipe         = Gst.parse_launch("ximagesrc startx={} \
+        if self.xid == 0 and not self.selectarea:
+            self.pipe         = Gst.parse_launch("ximagesrc startx={} \
                                              starty={} \
                                              endx={} \
                                              endy={} \
@@ -294,6 +297,25 @@ class GstScreenCast(object):
                                                                  self.framerate,
                                                                  self.endx,
                                                                  self.endy,
+                                                                 self.pipeline,
+                                                                 self.filelocation))
+        else:
+            self.pipe         = Gst.parse_launch("ximagesrc startx={} \
+                                             starty={} \
+                                             endx={} \
+                                             endy={} \
+                                             show-pointer={} \
+                                             xid = {} \
+                                             use-damage={} !  \
+                                             {} \
+                                             ! filesink \
+                                             location={}".format(self.startx,
+                                                                 self.starty,
+                                                                 self.endx,
+                                                                 self.endy,
+                                                                 self.show_pointer,
+                                                                 self.xid,
+                                                                 self.use_damage,
                                                                  self.pipeline,
                                                                  self.filelocation))
         
@@ -516,7 +538,7 @@ class ScreenCast(object):
                                         startx=x,starty=y,use_damage=self.use_damage,
                                         endx=width,endy=height,xid=self.xid,iconify=self.iconify,parent=self.parent,
                                         start_button=self.start_button,
-                                        stop_button=self.stop_button,framerate=self.framerate,time_label=self.time_label)
+                                        stop_button=self.stop_button,framerate=self.framerate,time_label=self.time_label,selectarea=self.selectarea)
         else:
             self.player = GnomeScreenCast(self.filelocation,startx=x,starty=y,
                                      endx=width,endy=height,
@@ -583,7 +605,7 @@ class ScreenCast(object):
                                                 endx=width,endy=height,xid=self.xid,iconify=self.iconify,
                                                 parent=self.parent,
                                                 start_button=self.start_button,
-                                                stop_button=self.stop_button,framerate=self.framerate,time_label=self.time_label)
+                                                stop_button=self.stop_button,framerate=self.framerate,time_label=self.time_label,selectarea=self.selectarea)
                 else:
                     self.player = GnomeScreenCast(self.filelocation,startx=x,starty=y,
                                              endx=width,endy=height,
@@ -603,7 +625,7 @@ class ScreenCast(object):
                                             startx=self.startx,starty=self.starty,use_damage=self.use_damage,
                                             endx=self.endx,endy=self.endy,xid=self.xid,iconify=self.iconify,parent=self.parent,
                                             start_button=self.start_button,
-                                            stop_button=self.stop_button,framerate=self.framerate,time_label=self.time_label)
+                                            stop_button=self.stop_button,framerate=self.framerate,time_label=self.time_label,selectarea=self.selectarea)
             else:
                 self.player = GnomeScreenCast(self.filelocation,startx=self.startx,starty=self.starty,
                                          endx=self.endx,endy=self.endy,
