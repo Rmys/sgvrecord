@@ -844,9 +844,9 @@ class AppWindow(Gtk.ApplicationWindow):
     def on_start_clicked(self,button):
         text = self.filenameentry.get_text()
         if  text:
-            file_name = text
+            file_name = text+".webm"
         else:
-            file_name = "SGvrecord"+str(int(time.time()))+".mkv"
+            file_name = "SGvrecord"+str(int(time.time()))+".webm"
         location = self.choicefolder.get_uri()
         location = os.path.join(location,file_name)[7:]
 
