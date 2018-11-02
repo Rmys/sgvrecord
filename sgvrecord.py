@@ -326,7 +326,9 @@ class GstScreenCast(object):
         self.is_start      = False
 
     def set_timeout_to_label(self,old_time):
-        self.time_label.props.label = "<span font_weight=\"bold\" foreground=\"red\">{}</span>".format(int(time.time()-old_time))
+        t = time.gmtime(time.time()-old_time)
+        t = time.strftime("%H:%M:%S",t)
+        self.time_label.props.label = "<span font_weight=\"bold\" foreground=\"red\">{}</span>".format(t)
         if not self.is_start:
             self.time_label.props.label = "<span font_weight=\"bold\" foreground=\"red\">""</span>"
         return self.is_start
