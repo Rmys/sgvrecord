@@ -137,7 +137,9 @@ def is_gnome_on_xorg():
             return False
     return True
 
-
+def run_appinfo(location):
+    Gio.AppInfo.launch_default_for_uri((location),None)
+    
 def old_alsa_get_audio_sources():
     result = dict()
     count = 0
@@ -255,25 +257,29 @@ class GstScreenCast(object):
                       stop_button,
                       framerate,
                       time_label,
-                      selectarea):
+                      selectarea,
+                      open_location,
+                      play):
                           
-        self.filelocation = filelocation
-        self.start_button = start_button
-        self.stop_button  = stop_button
-        self.time_label   = time_label
-        self.pipeline     = pipeline
-        self.startx       = startx
-        self.starty       = starty
-        self.endx         = endx
-        self.endy         = endy
-        self.xid          = xid
-        self.show_pointer = show_pointer
-        self.use_damage   = use_damage
-        self.status       = status
-        self.parent       = parent
-        self.iconify      = iconify
-        self.framerate    = framerate
-        self.selectarea   = selectarea
+        self.filelocation  = filelocation
+        self.start_button  = start_button
+        self.stop_button   = stop_button
+        self.time_label    = time_label
+        self.pipeline      = pipeline
+        self.startx        = startx
+        self.starty        = starty
+        self.endx          = endx
+        self.endy          = endy
+        self.xid           = xid
+        self.show_pointer  = show_pointer
+        self.use_damage    = use_damage
+        self.status        = status
+        self.parent        = parent
+        self.iconify       = iconify
+        self.framerate     = framerate
+        self.selectarea    = selectarea
+        self.open_location = open_location
+        self.play          = play
         if self.xid != 0:
             self.use_damage = "false"
         if self.xid != 0 or  self.selectarea:
@@ -294,7 +300,7 @@ class GstScreenCast(object):
                                                                  self.xid,
                                                                  self.use_damage,
                                                                  self.pipeline,
-                                                                 self.filelocation))
+                                                                 self.filelocation[7:]))
         else:
             self.pipe         = Gst.parse_launch("ximagesrc startx={} \
                                              starty={} \
@@ -317,7 +323,7 @@ class GstScreenCast(object):
                                                                  self.endx,
                                                                  self.endy,
                                                                  self.pipeline,
-                                                                 self.filelocation))
+                                                                 self.filelocation[7:]))
         
         bus = self.pipe.get_bus()
         bus.add_signal_watch()
@@ -356,6 +362,11 @@ class GstScreenCast(object):
             self.start_button.set_sensitive(True)
             self.stop_button.set_sensitive(False)
             self.is_start = False
+            if self.open_location:
+                run_appinfo(os.path.dirname(self.filelocation))
+            if self.play:
+                run_appinfo(self.filelocation)
+                
         else:
             self.start_button.set_sensitive(False)
             self.stop_button.set_sensitive(True)
@@ -395,25 +406,28 @@ class GnomeScreenCast(object):
                       iconify,
                       start_button,
                       stop_button,
-                      time_label):
+                      time_label,
+                      open_location,
+                      play):
 
-        self.filelocation = filelocation
-        self.start_button = start_button
-        self.stop_button  = stop_button
-        self.time_label   = time_label
-        self.pipeline     = pipeline
-        self.startx       = startx
-        self.starty       = starty
-        self.endx         = endx
-        self.endy         = endy
-        self.show_pointer = show_pointer
-        self.framerate    = framerate
-        self.status       = status
-        self.parent       = parent
-        self.iconify      = iconify
-        
-        self.bus          = Gio.bus_get_sync(Gio.BusType.SESSION, None)
-        self.__proxy      = Gio.DBusProxy.new_sync(self.bus, 
+        self.filelocation  = filelocation
+        self.start_button  = start_button
+        self.stop_button   = stop_button
+        self.time_label    = time_label
+        self.pipeline      = pipeline
+        self.startx        = startx
+        self.starty        = starty
+        self.endx          = endx
+        self.endy          = endy
+        self.show_pointer  = show_pointer
+        self.framerate     = framerate
+        self.status        = status
+        self.parent        = parent
+        self.iconify       = iconify
+        self.open_location = open_location
+        self.play          = play
+        self.bus           = Gio.bus_get_sync(Gio.BusType.SESSION, None)
+        self.__proxy       = Gio.DBusProxy.new_sync(self.bus, 
                                Gio.DBusProxyFlags.NONE,
                                None,
                                'org.gnome.Shell.Screencast',
@@ -437,7 +451,7 @@ class GnomeScreenCast(object):
                       self.starty,
                       self.endx,
                       self.endy,
-                      self.filelocation,
+                      self.filelocation[7:],
                       options))
 
         self.status[0] =  self.__proxy.call_sync('ScreencastArea',parameters , Gio.DBusCallFlags.NO_AUTO_START,-1,None)
@@ -463,6 +477,10 @@ class GnomeScreenCast(object):
             self.start_button.set_sensitive(True)
             self.stop_button.set_sensitive(False)
             self.is_start = False
+            if self.open_location:
+                run_appinfo(os.path.dirname(self.filelocation))
+            if self.play:
+                run_appinfo(self.filelocation)
         else:
             self.start_button.set_sensitive(False)
             self.stop_button.set_sensitive(True)
@@ -493,29 +511,33 @@ class ScreenCast(object):
                       force_use_window_area=False,
                       start_button=None,
                       stop_button=None,
-                      time_label=None):
+                      time_label=None,
+                      open_location=False,
+                      play=False):
                           
 
         self.parent       = parent
 
         
-        self.filelocation = filelocation
-        self.start_button = start_button
-        self.stop_button  = stop_button
-        self.time_label   = time_label
-        self.pipeline     = pipeline
-        self.startx       = startx
-        self.starty       = starty
-        self.endx         = endx
-        self.endy         = endy
-        self.show_pointer = show_pointer
-        self.framerate    = framerate
-        self.xid          = xid
-        self.show_pointer = show_pointer
-        self.use_damage   = use_damage
-        self.status       = [None]
-        self.selectarea   = selectarea
-        self.iconify      = iconify
+        self.filelocation  = filelocation
+        self.start_button  = start_button
+        self.stop_button   = stop_button
+        self.time_label    = time_label
+        self.pipeline      = pipeline
+        self.startx        = startx
+        self.starty        = starty
+        self.endx          = endx
+        self.endy          = endy
+        self.show_pointer  = show_pointer
+        self.framerate     = framerate
+        self.xid           = xid
+        self.show_pointer  = show_pointer
+        self.use_damage    = use_damage
+        self.status        = [None]
+        self.selectarea    = selectarea
+        self.iconify       = iconify
+        self.open_location = open_location
+        self.play          = play
         self.force_use_window_area = force_use_window_area
         if self.xid != 0 and self.selectarea:
             self.selectarea = False
@@ -540,7 +562,8 @@ class ScreenCast(object):
                                         startx=x,starty=y,use_damage=self.use_damage,
                                         endx=width,endy=height,xid=self.xid,iconify=self.iconify,parent=self.parent,
                                         start_button=self.start_button,
-                                        stop_button=self.stop_button,framerate=self.framerate,time_label=self.time_label,selectarea=self.selectarea)
+                                        stop_button=self.stop_button,framerate=self.framerate,time_label=self.time_label,selectarea=self.selectarea,
+                                        open_location=self.open_location,play=self.play)
         else:
             self.player = GnomeScreenCast(self.filelocation,startx=x,starty=y,
                                      endx=width,endy=height,
@@ -549,7 +572,7 @@ class ScreenCast(object):
                                      framerate=self.framerate,
                                      status=self.status,iconify=self.iconify,parent=self.parent,
                                      start_button=self.start_button,
-                                     stop_button=self.stop_button,time_label=self.time_label)
+                                     stop_button=self.stop_button,time_label=self.time_label,open_location=self.open_location,play=self.play)
         if self.parent:
             self.parent.show()
         self.player.start()
@@ -607,7 +630,8 @@ class ScreenCast(object):
                                                 endx=width,endy=height,xid=self.xid,iconify=self.iconify,
                                                 parent=self.parent,
                                                 start_button=self.start_button,
-                                                stop_button=self.stop_button,framerate=self.framerate,time_label=self.time_label,selectarea=self.selectarea)
+                                                stop_button=self.stop_button,framerate=self.framerate,time_label=self.time_label,selectarea=self.selectarea,
+                                                open_location=self.open_location,play=self.play)
                 else:
                     self.player = GnomeScreenCast(self.filelocation,startx=x,starty=y,
                                              endx=width,endy=height,
@@ -616,7 +640,8 @@ class ScreenCast(object):
                                              framerate=self.framerate,
                                              status=self.status,iconify=self.iconify,parent=self.parent,
                                              start_button=self.start_button,
-                                             stop_button=self.stop_button,time_label=self.time_label)
+                                             stop_button=self.stop_button,time_label=self.time_label,
+                                             open_location=self.open_location,play=self.play)
                 return self.player.start()
         
         else:
@@ -627,7 +652,8 @@ class ScreenCast(object):
                                             startx=self.startx,starty=self.starty,use_damage=self.use_damage,
                                             endx=self.endx,endy=self.endy,xid=self.xid,iconify=self.iconify,parent=self.parent,
                                             start_button=self.start_button,
-                                            stop_button=self.stop_button,framerate=self.framerate,time_label=self.time_label,selectarea=self.selectarea)
+                                            stop_button=self.stop_button,framerate=self.framerate,time_label=self.time_label,selectarea=self.selectarea,
+                                            open_location=self.open_location,play=self.play)
             else:
                 self.player = GnomeScreenCast(self.filelocation,startx=self.startx,starty=self.starty,
                                          endx=self.endx,endy=self.endy,
@@ -636,7 +662,8 @@ class ScreenCast(object):
                                          framerate=self.framerate,
                                          status=self.status,iconify=self.iconify,parent=self.parent,
                                          start_button=self.start_button,
-                                         stop_button=self.stop_button,time_label=self.time_label)
+                                         stop_button=self.stop_button,time_label=self.time_label,
+                                         open_location=self.open_location,play=self.play)
             return self.player.start()
 
     def stop(self):
@@ -776,7 +803,24 @@ class AppWindow(Gtk.ApplicationWindow):
         self.mainvbox_button.pack_start(self.minimizecheckbutton,False,False,0)
         #########################################################################
         
+        ##########################################################################
+        self.open_location_label = Gtk.Label()
+        self.open_location_label.props.label = "Open Location After Stop"
+        self.openlocationecheckbutton = Gtk.CheckButton()
+        self.openlocationecheckbutton.set_active(True)
+        self.mainvbox_label.pack_start(self.open_location_label,True,False,0)
+        self.mainvbox_button.pack_start(self.openlocationecheckbutton,False,False,0)
+        #########################################################################
         
+        
+        ##########################################################################
+        self.play_label = Gtk.Label()
+        self.play_label.props.label = "Play Video After Stop"
+        self.playcheckbutton = Gtk.CheckButton()
+        self.playcheckbutton.set_active(False)
+        self.mainvbox_label.pack_start(self.play_label,True,False,0)
+        self.mainvbox_button.pack_start(self.playcheckbutton,False,False,0)
+        #########################################################################
         
         #########################################################################
         
@@ -850,14 +894,14 @@ class AppWindow(Gtk.ApplicationWindow):
         else:
             file_name = "SGvrecord"+str(int(time.time()))+".webm"
         location = self.choicefolder.get_uri()
-        location = os.path.join(location,file_name)[7:]
+        location = os.path.join(location,file_name)
 
         if os.path.exists(location):
             if not os.path.isfile(location):
-                msg = "Cant Replace  \"{}\"!\nAn older unknown location type with same name already exists".format(location)
+                msg = "Cant Replace  \"{}\"!\nAn older unknown location type with same name already exists".format(location[7:])
                 NInfo(msg,self)
                 return
-            msg = "Replace file \"{}\"?\nAn older file with same name already exists".format(location)
+            msg = "Replace file \"{}\"?\nAn older file with same name already exists".format(location[7:])
             yn = Yes_Or_No(msg,self)
             if not yn.check():
                 return
@@ -906,7 +950,9 @@ class AppWindow(Gtk.ApplicationWindow):
                                      force_use_window_area=False,
                                      stop_button=self.stop_button,
                                      start_button=self.start_button,
-                                     time_label=self.time_label)
+                                     time_label=self.time_label,
+                                     open_location=self.openlocationecheckbutton.get_active(),
+                                     play=self.playcheckbutton.get_active())
         else:
             self.player = ScreenCast(location,
                                      pipeline=pipe,
@@ -924,7 +970,9 @@ class AppWindow(Gtk.ApplicationWindow):
                                      force_use_window_area=False,
                                      stop_button=self.stop_button,
                                      start_button=self.start_button,
-                                     time_label=self.time_label)
+                                     time_label=self.time_label,
+                                     open_location=self.openlocationecheckbutton.get_active(),
+                                     play=self.playcheckbutton.get_active())
                                      
         self.player.start()
 
