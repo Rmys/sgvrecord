@@ -733,7 +733,7 @@ class AppWindow(Gtk.ApplicationWindow):
         self.video_source_combo.append("0","Current Monitor")
         self.video_source_combo.append("-1","Select Area")
         for i in get_all_window_xid():
-            self.video_source_combo.append("{}".format(i[0]),i[1]+" "+i[2][:50])
+            self.video_source_combo.append("{}".format(i[0]),i[1][:30]+" "+i[2][:30])
         self.video_source_combo.set_active(0)
 
         self.mainvbox_label.pack_start(self.video_source_combo_label,False,True,0)
