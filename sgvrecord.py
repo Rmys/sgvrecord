@@ -138,7 +138,10 @@ def is_gnome_on_xorg():
     return True
 
 def run_appinfo(location):
-    Gio.AppInfo.launch_default_for_uri((location),None)
+    try:
+        Gio.AppInfo.launch_default_for_uri((location),None)
+    except Exception as e:
+        print(e)
     
 def old_alsa_get_audio_sources():
     result = dict()
@@ -680,6 +683,7 @@ class AppWindow(Gtk.ApplicationWindow):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        self.connect("delete-event",self.on_delete_event)
         self.set_border_width(10)
         self.set_size_request(500, 300)
         self.set_resizable(False)
@@ -886,7 +890,7 @@ class AppWindow(Gtk.ApplicationWindow):
         ###############################################################################
         self.add(self.mainvbox)
         self.show_all()
-        
+
     def on_start_clicked(self,button):
         text = self.filenameentry.get_text()
         if  text:
@@ -993,6 +997,19 @@ class AppWindow(Gtk.ApplicationWindow):
             return self.video_source_combo.get_model()[iter_][1]
         return ""
         
+    def on_delete_event(self,window,event):
+        try:
+            if not window.start_button.get_sensitive():
+                y = Yes_Or_No("Record Is Running ,Exit?",window)
+                if not y.check():
+                    return True
+                else:
+                    self.player.stop()
+        except Exception as e:
+            print(e)
+            pass
+
+        
 class Application(Gtk.Application):
 
     def __init__(self, *args, **kwargs):
@@ -1019,7 +1036,17 @@ class Application(Gtk.Application):
 
         self.window.present()
     def on_quit(self, action, param):
-        self.window._quit()
+        try:
+            if not self.window.start_button.get_sensitive():
+                y = Yes_Or_No("Record Is Running ,Exit?",self.window)
+                if not y.check():
+                    return True
+                else:
+                    self.window.player.stop()
+                    self.quit()
+        except Exception as e:
+            print(e)
+            pass
         self.quit()
 
     def on_about(self,a,p):
@@ -1046,5 +1073,4 @@ if __name__ == "__main__":
 
 
 
-# make rpm
-# make plugin
+# add delay
