@@ -896,8 +896,8 @@ class AppWindow(Gtk.ApplicationWindow):
         location = self.choicefolder.get_uri()
         location = os.path.join(location,file_name)
 
-        if os.path.exists(location):
-            if not os.path.isfile(location):
+        if os.path.exists(location[7:]):
+            if not os.path.isfile(location[7:]):
                 msg = "Cant Replace  \"{}\"!\nAn older unknown location type with same name already exists".format(location[7:])
                 NInfo(msg,self)
                 return
