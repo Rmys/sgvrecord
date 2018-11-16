@@ -13,7 +13,7 @@ Requires:       gtk3
 Requires:       gstreamer1
 Requires:       gstreamer1-plugins-good
 Requires:       gstreamer1-plugins-base
-#Requires:       libwnck3
+Requires:       libwnck3
 Requires:       alsa-utils
 Requires:       pulseaudio-utils
 
