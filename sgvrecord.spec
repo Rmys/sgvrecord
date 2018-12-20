@@ -1,6 +1,6 @@
 Name:           sgvrecord
 Version:        1.0
-Release:        2%{?dist}
+Release:        3%{?dist}
 Summary:        Simple Tool To Record Screen
 License:        GPLv3     
 URL:            https://github.com/yucefsourani/sgvrecord
@@ -42,6 +42,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_datadir}/doc/sgvrecord/LICENSE
 
 %changelog
+* Tue Dec 20 2018 yucuf sourani <youssef.m.sourani@gmail.com> 1.0-3
+- Release 2 
+
 * Tue Oct 30 2018 yucuf sourani <youssef.m.sourani@gmail.com> 1.0-2
 - Release 2 
 
