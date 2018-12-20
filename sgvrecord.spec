@@ -43,7 +43,7 @@ rm -rf $RPM_BUILD_ROOT
 
 %changelog
 * Tue Dec 20 2018 yucuf sourani <youssef.m.sourani@gmail.com> 1.0-3
-- Release 2 
+- Release 3 
 
 * Tue Oct 30 2018 yucuf sourani <youssef.m.sourani@gmail.com> 1.0-2
 - Release 2 
