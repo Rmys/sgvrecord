@@ -146,7 +146,7 @@ def run_appinfo(location):
 def old_alsa_get_audio_sources():
     result = dict()
     count = 0
-    p = subprocess.Popen("aplay -l",shell=True,stdout=subprocess.PIPE).communicate()[0].decode("utf-8").split("\n")
+    p = subprocess.Popen("LANG=en_US.utf8 aplay -l",shell=True,stdout=subprocess.PIPE).communicate()[0].decode("utf-8").split("\n")
     for line in p:
         line = line.strip()
         if line.startswith("card "):
@@ -157,7 +157,7 @@ def old_alsa_get_audio_sources():
     
 def alsa_get_audio_sources(raw=False):
     result = {}
-    p = subprocess.Popen("aplay -l",shell=True,stdout=subprocess.PIPE).communicate()[0].decode("utf-8").split("\n")
+    p = subprocess.Popen("LANG=en_US.utf8 aplay -l",shell=True,stdout=subprocess.PIPE).communicate()[0].decode("utf-8").split("\n")
     for i in p:
         if i.startswith("card "):
             pp = i.split(":")
@@ -178,7 +178,7 @@ def alsa_get_audio_sources(raw=False):
 
 def pulse_get_audio_source(raw=False):
     result = {}
-    p=subprocess.Popen("pactl list | grep -A3 'Source #'",shell=True,stdout=subprocess.PIPE).communicate()[0].decode("utf-8").strip().split("\n")
+    p=subprocess.Popen("LANG=en_US.utf8 pactl list | grep -A3 'Source #'",shell=True,stdout=subprocess.PIPE).communicate()[0].decode("utf-8").strip().split("\n")
     for i in p:
         ii=i.strip()
         if ii.startswith("Name:"):
