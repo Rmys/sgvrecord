@@ -157,6 +157,7 @@ def old_alsa_get_audio_sources():
     
 def alsa_get_audio_sources(raw=False):
     result = {}
+    count  = 1
     p = subprocess.Popen("LANG=en_US.utf8 aplay -l",shell=True,stdout=subprocess.PIPE).communicate()[0].decode("utf-8").split("\n")
     for i in p:
         if i.startswith("card "):
@@ -170,22 +171,27 @@ def alsa_get_audio_sources(raw=False):
                     info   = jj[:-9]
                     info   = info + pp[pp.index(j)+1]
             if not raw:
-                result.setdefault("Alsa "+info,"alsasrc device=\"hw:{},{}\"".format(card,device))
+                result.setdefault("Alsa "+info+str(count),"alsasrc device=\"hw:{},{}\"".format(card,device))
+                count+=1
             else:
-                result.setdefault("Alsa "+info,"hw:{},{}".format(card,device))
+                result.setdefault("Alsa "+info+str(count),"hw:{},{}".format(card,device))
+                count+=1
     return result
 
 
 def pulse_get_audio_source(raw=False):
     result = {}
+    count  = 1
     p=subprocess.Popen("LANG=en_US.utf8 pactl list | grep -A3 'Source #'",shell=True,stdout=subprocess.PIPE).communicate()[0].decode("utf-8").strip().split("\n")
     for i in p:
         ii=i.strip()
         if ii.startswith("Name:"):
             if not raw:
-                result.setdefault("Pulse "+p[p.index(i)+1].split(":",1)[-1].strip(),"pulsesrc device=\"{}\"".format(ii.split(":",1)[-1].strip()))
+                result.setdefault("Pulse "+p[p.index(i)+1].split(":",1)[-1].strip()+str(count),"pulsesrc device=\"{}\"".format(ii.split(":",1)[-1].strip()))
+                count+=1
             else:
-                result.setdefault("Pulse "+p[p.index(i)+1].split(":",1)[-1].strip(),ii.split(":",1)[-1].strip())
+                result.setdefault("Pulse "+p[p.index(i)+1].split(":",1)[-1].strip()+str(count),ii.split(":",1)[-1].strip())
+                count+=1
     
     return result
 
@@ -715,7 +721,7 @@ class AppWindow(Gtk.ApplicationWindow):
         alsa_audio_source = alsa_get_audio_sources()
         all_audio_sources.update(alsa_audio_source)
         for k,v in all_audio_sources.items():
-            self.audio_source_combo.append(v,k)
+            self.audio_source_combo.append(v,k[:-1]+" ({})".format(v.split("=",1)[-1])[:50])
         self.audio_source_combo.set_active(0)
 
         self.mainvbox_label.pack_start(self.audio_source_combo_label,False,True,0)
